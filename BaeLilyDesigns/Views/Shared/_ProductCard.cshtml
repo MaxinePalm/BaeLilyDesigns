@@ -1,0 +1,37 @@
+@model BaeLilyDesigns.Models.Product
+
+<div class="product-card">
+    @if (Model.Badge != null)
+    {
+        <div class="product-badge">@Model.Badge</div>
+    }
+    <a asp-controller="Shop" asp-action="Detail" asp-route-id="@Model.Id" style="text-decoration:none;color:inherit;">
+        <div class="product-img" style="background:linear-gradient(135deg,@(Model.Colors.Count > 2 ? Model.Colors[2] : "#D4B896"),@(Model.Colors.Count > 1 ? Model.Colors[1] : "#8B6F47"));">
+            <span style="font-size:5rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2));">@Model.Emoji</span>
+        </div>
+        <div class="product-info">
+            <div class="product-name">@Model.Name</div>
+            <div class="product-meta">@(char.ToUpper(Model.Category[0]) + Model.Category[1..]) - 70% organic cotton</div>
+            <div class="product-footer">
+                <div class="product-price">
+                    @if (Model.OriginalPrice.HasValue)
+                    {
+                        <span style="text-decoration:line-through;opacity:0.5;font-size:0.9rem;margin-right:6px;">A$@Model.OriginalPrice.Value.ToString("N0")</span>
+                    }
+                    A$@Model.Price.ToString("N0")
+                </div>
+                @if (Model.IsSoldOut)
+                {
+                    <div class="sold-out-badge">Sold Out</div>
+                }
+                else
+                {
+                    <button class="add-btn"
+                            onclick="event.preventDefault();event.stopPropagation();addToCart(@Model.Id, 'M')">
+                        Add to Bag
+                    </button>
+                }
+            </div>
+        </div>
+    </a>
+</div>

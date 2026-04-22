@@ -1,0 +1,17 @@
+@model List<BaeLilyDesigns.Models.Product>
+@{
+    ViewData["Title"] = "Sale";
+}
+
+<div class="shop-header">
+    <p class="section-label" style="color:#E53E3E;">Limited time</p>
+    <h1 class="section-title">On <em>sale now</em></h1>
+    <p style="opacity:0.7;margin-bottom:2rem;">These are the ones we want to move fast. Once they're gone, they're gone.</p>
+
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</div>

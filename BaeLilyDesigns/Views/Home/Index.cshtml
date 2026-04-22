@@ -1,0 +1,88 @@
+@model List<BaeLilyDesigns.Models.Product>
+@{
+    ViewData["Title"] = "Hoodies with a soul";
+}
+
+<section class="hero" style="min-height:calc(100vh - 40px);">
+    <div class="hero-bg-text">BAE LILY DESIGNS</div>
+    <p class="hero-eyebrow">Handmade with care - shipped with love</p>
+    <h1 class="hero-title">Wear every<br><em>version of you</em></h1>
+    <p class="hero-sub"><span>Sustainable hoodies crafted for every aesthetic, every mood, every story.</span></p>
+    <div class="hero-cta">
+        <a class="btn-primary" asp-controller="Shop" asp-action="Index">Shop Now</a>
+        <a class="btn-outline" asp-controller="About" asp-action="Index">Our Story</a>
+    </div>
+    <div class="hero-scroll">
+        <div class="scroll-line"></div>
+    </div>
+</section>
+
+<div class="ticker-wrap">
+    <div class="ticker">
+        <span>Top Seller: Pearl Party Hoodie</span><span class="ticker-dot">·</span>
+        <span>New Drop: Goth Rose Edition</span><span class="ticker-dot">·</span>
+        <span>Restocked: Bibliophile Cream</span><span class="ticker-dot">·</span>
+        <span>Kids Range Now Live</span><span class="ticker-dot">·</span>
+        <span>Pre-orders ship in 2–3 weeks</span><span class="ticker-dot">·</span>
+        <span>70% Organic Cotton</span><span class="ticker-dot">·</span>
+        <span>Top Seller: Pearl Party Hoodie</span><span class="ticker-dot">·</span>
+        <span>New Drop: Goth Rose Edition</span><span class="ticker-dot">·</span>
+        <span>Restocked: Bibliophile Cream</span><span class="ticker-dot">·</span>
+        <span>Kids Range Now Live</span><span class="ticker-dot">·</span>
+    </div>
+</div>
+
+<!-- AESTHETIC PICKER -->
+<div class="aesthetic-bar">
+    <p class="aesthetic-label">Find your aesthetic</p>
+    <div class="aesthetic-pills">
+        <button class="pill active" onclick="setTheme('default', this)">All Styles</button>
+        <button class="pill" onclick="setTheme('goth', this)">Goth</button>
+        <button class="pill" onclick="setTheme('office', this)">Office Chic</button>
+        <button class="pill" onclick="setTheme('bubbly', this)">Bubbly</button>
+        <button class="pill" onclick="setTheme('bright', this)">Bright</button>
+        <button class="pill" onclick="setTheme('booktok', this)">BookTok</button>
+        <button class="pill" onclick="setTheme('kids', this)">Kids</button>
+    </div>
+</div>
+
+<!-- BESTSELLERS -->
+<section>
+    <div class="reveal">
+        <p class="section-label">Most loved</p>
+        <h2 class="section-title">Top 5 <em>best sellers</em></h2>
+    </div>
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</section>
+
+<!-- VALUES -->
+<div style="background:var(--card-bg);transition:background var(--transition);">
+    <section>
+        <div class="reveal">
+            <p class="section-label">Why Bae Lily Designs</p>
+            <h2 class="section-title">Made with <em>intention</em></h2>
+        </div>
+        <div class="values-grid" style="margin-top:3rem;">
+            <div class="value-card reveal reveal-delay-1">
+                <div class="value-icon">🌿</div>
+                <div class="value-title">Sustainably made</div>
+                <p class="value-text">70% organic cotton, 30% recycled polyester. Every choice reduces our footprint without reducing your comfort.</p>
+            </div>
+            <div class="value-card reveal reveal-delay-2">
+                <div class="value-icon">🤝</div>
+                <div class="value-title">Ethically sourced</div>
+                <p class="value-text">Fair wages, safe working conditions, and full supply chain transparency. We know where every thread comes from.</p>
+            </div>
+            <div class="value-card reveal reveal-delay-3">
+                <div class="value-icon">🎨</div>
+                <div class="value-title">Every aesthetic</div>
+                <p class="value-text">From goth to BookTok, office chic to kids' characters - fashion should celebrate who you are, not box you in.</p>
+            </div>
+        </div>
+    </section>
+</div>

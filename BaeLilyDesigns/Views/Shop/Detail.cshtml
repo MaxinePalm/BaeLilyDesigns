@@ -1,0 +1,101 @@
+@model BaeLilyDesigns.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+    var stockPct = Math.Min(100, (int)Math.Round((double)Model.Stock / Model.Stock * 100));
+    var low = stockPct < 30;
+    var color2 = Model.Colors.Count > 2 ? Model.Colors[2] : "#D4B896";
+    var color1 = Model.Colors.Count > 1 ? Model.Colors[1] : "#8B6F47";
+}
+
+<div class="product-detail">
+    <div>
+        <div class="detail-img" style="background:linear-gradient(135deg,@color2,@color1);">
+            <span style="filter:drop-shadow(0 8px 20px rgba(0,0,0,0.25));font-size:8rem;">@Model.Emoji</span>
+        </div>
+    </div>
+
+    <div class="detail-info">
+        <a class="back-btn" asp-controller="Shop" asp-action="Index">← Back to shop</a>
+
+        @if (Model.Badge != null)
+        {
+            <span class="product-badge" style="position:relative;top:0;left:0;display:inline-block;margin-bottom:1rem;">@Model.Badge</span>
+        }
+
+        <h1 class="detail-name">@Model.Name</h1>
+        <div class="detail-price">
+            @if (Model.OriginalPrice.HasValue)
+            {
+                <span style="text-decoration:line-through;opacity:0.5;font-size:1rem;margin-right:8px;">A$@Model.OriginalPrice.Value.ToString("N0")</span>
+            }
+            A$@Model.Price.ToString("N0")
+        </div>
+
+        <p class="detail-desc">@Model.Description</p>
+
+        <div class="stock-bar">
+            <div class="stock-label">
+                <span>Stock availability</span>
+                <span style="color:@(low ? "#E53E3E" : "var(--accent)")">
+                    @(low ? "Low stock - " : "")@Model.Stock remaining
+                </span>
+            </div>
+            <div class="stock-track">
+                <div class="stock-fill" style="width:@stockPct%;background:@(low ? "#E53E3E" : "var(--accent)")"></div>
+            </div>
+        </div>
+
+        <div class="size-label">
+            Select size
+            <span class="size-guide-link">Size guide</span>
+        </div>
+        <div class="size-grid" id="sizeGrid">
+            @foreach (var size in Model.Sizes)
+            {
+                <button class="size-btn" onclick="selectSize(this)" data-size="@size">@size</button>
+            }
+        </div>
+
+        <div class="size-label" style="margin-top:1rem;">Colour</div>
+        <div class="color-swatches">
+            @for (int i = 0; i < Model.Colors.Count; i++)
+            {
+                <div class="swatch @(i == 0 ? "selected" : "")"
+                    style="background:@Model.Colors[i];border:3px solid @(i == 0 ? "var(--accent)" : "transparent");"
+                    onclick="selectColor(this)"></div>
+            }
+        </div>
+
+        <div class="detail-actions">
+            @if (Model.IsSoldOut)
+            {
+                <div class="sold-out-badge" style="flex:1;padding:1.1rem;text-align:center;">Sold Out - Join waitlist</div>
+            }
+            else
+            {
+                <button class="detail-add-btn" onclick="addToCartDetail(@Model.Id)">Pre-order Now</button>
+            }
+            <button class="wishlist-btn">♡</button>
+        </div>
+
+        <div class="material-info">
+            <strong>Material &amp; Care</strong>
+            @Model.Material<br>
+            Machine wash cold. Tumble dry low. Do not bleach.
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedSize = '@Model.Sizes.FirstOrDefault()';
+
+    function selectSize(btn) {
+        document.querySelectorAll('#sizeGrid .size-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedSize = btn.dataset.size;
+    }
+
+    function addToCartDetail(id) {
+        addToCart(id, selectedSize);
+    }
+</script>

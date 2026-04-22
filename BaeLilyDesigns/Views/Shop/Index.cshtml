@@ -1,0 +1,81 @@
+@model List<BaeLilyDesigns.Models.Product>
+@{
+    ViewData["Title"] = "Shop";
+    var currentCategory = ViewBag.CurrentCategory as string ?? "all";
+
+    var categories = new[] {
+        ("all", "All"),
+        ("goth", "Goth"),
+        ("office", "Office Chic"),
+        ("bubbly", "Bubbly"),
+        ("bright", "Bright"),
+        ("booktok", "BookTok"),
+        ("kids", "Kids"),
+        ("sale", "On Sale")
+    };
+}
+
+<div class="shop-header">
+    <p class="section-label">Find your style</p>
+    <h1 class="section-title">The <em>full collection</em></h1>
+
+    <!-- FILTER BAR — changes both the product list and the site aesthetic -->
+    <div class="filter-bar">
+        @foreach (var (value, label) in categories)
+        {
+            var theme = value switch {
+                "goth"     => "goth",
+                "office"   => "office",
+                "bubbly"   => "bubbly",
+                "bright"   => "bright",
+                "booktok"  => "booktok",
+                "kids"     => "kids",
+                _          => "default"
+            };
+            <a href="@Url.Action("Index", "Shop", new { category = value })"
+                class="filter-btn @(currentCategory == value ? "active" : "")"
+                onclick="event.preventDefault(); setTheme('@theme', this); setTimeout(() => window.location.href = this.href, 150);">
+                @label
+            </a>
+        }
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</div>
+
+<script>
+    // On page load, apply theme that matches the current server-filtered category
+    // (site.js loadSavedTheme() handles localStorage restore on all other pages,
+    //  but here we also sync to the active filter so a direct URL visit looks right)
+    document.addEventListener("DOMContentLoaded", () => {
+        const categoryThemeMap = {
+            goth: "goth", office: "office", bubbly: "bubbly",
+            bright: "bright", booktok: "booktok", kids: "kids"
+        };
+        const currentCategory = "@currentCategory";
+        const savedTheme = (() => { try { return localStorage.getItem('tb-theme'); } catch(e) { return null; } })();
+
+        // Use the URL category as the source of truth on the shop page
+        const theme = categoryThemeMap[currentCategory] || "default";
+        if (theme !== (savedTheme || "default")) {
+            // Only override saved theme if the URL category has its own aesthetic
+            if (categoryThemeMap[currentCategory]) {
+                setTheme(theme, null);
+            }
+        }
+
+        // Mark the active filter button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const href = btn.getAttribute('href') || '';
+            const isActive = href.includes('category=@currentCategory') ||
+                            ('@currentCategory' === 'all' && !href.includes('category='));
+            if (isActive) btn.classList.add('active');
+        });
+    });
+</script>
