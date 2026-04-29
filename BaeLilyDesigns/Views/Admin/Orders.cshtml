@@ -1,0 +1,92 @@
+@model List<BaeLilyDesigns.Models.Order>
+@{
+    ViewData["Title"] = "Admin – Orders";
+    ViewData["HidePreorder"] = true;
+    var currentStatus = ViewBag.CurrentStatus as string ?? "all";
+}
+
+<div style="max-width:1100px;margin:40px auto;padding:0 20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <div>
+            <h1 style="font-family:'Cinzel',serif;font-size:1.8rem;color:#2A2118;">Orders</h1>
+            <p style="color:#888;margin:4px 0 0;">@Model.Count orders</p>
+        </div>
+        <a asp-action="Products" style="padding:10px 20px;border:2px solid #2A2118;border-radius:8px;color:#2A2118;text-decoration:none;font-size:0.9rem;">← Products</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div style="background:#d4edda;color:#155724;padding:12px 18px;border-radius:8px;margin-bottom:20px;">✅ @TempData["Success"]</div>
+    }
+
+    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+        @foreach (var s in new[] { "all", "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
+        {
+            <a href="@Url.Action("Orders", new { status = s })"
+               style="padding:8px 18px;border-radius:20px;text-decoration:none;font-size:0.85rem;
+                      background:@(currentStatus == s ? "#2A2118" : "#f5f0e8");
+                      color:@(currentStatus == s ? "#D4B896" : "#2A2118");">
+                @s
+            </a>
+        }
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        @foreach (var order in Model)
+        {
+            <div style="background:white;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.06);padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <span style="font-family:'Cinzel',serif;font-size:1.1rem;color:#2A2118;">Order #@order.Id</span>
+                        <div style="color:#888;font-size:0.85rem;margin-top:4px;">@order.OrderDate.ToString("dd MMM yyyy, HH:mm")</div>
+                        <div style="margin-top:6px;">
+                            <strong style="color:#2A2118;">Customer:</strong>
+                            <span style="color:#555;"> @(order.User?.FullName ?? "Unknown") · @(order.User?.Email ?? "")</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:1.3rem;font-weight:700;color:#2A2118;">R@order.TotalAmount.ToString("N0")</div>
+                        <span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.8rem;margin-top:4px;
+                              background:@(order.Status == "Delivered" ? "#d4edda" : order.Status == "Shipped" ? "#cce5ff" : order.Status == "Cancelled" ? "#fee" : "#fff3cd");
+                              color:@(order.Status == "Delivered" ? "#155724" : order.Status == "Shipped" ? "#004085" : order.Status == "Cancelled" ? "#c00" : "#856404");">
+                            @order.Status
+                        </span>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px;border-top:1px solid #f0ebe3;padding-top:14px;">
+                    @foreach (var item in order.Items)
+                    {
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;color:#555;font-size:0.9rem;">
+                            <span>@item.ProductName – @item.Size × @item.Quantity</span>
+                            <span>R@((item.Price * item.Quantity).ToString("N0"))</span>
+                        </div>
+                    }
+                </div>
+
+                <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+                    @foreach (var s in new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
+                    {
+                        if (s != order.Status)
+                        {
+                            <form asp-action="UpdateOrderStatus" method="post" style="margin:0;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@order.Id" />
+                                <input type="hidden" name="status" value="@s" />
+                                <button type="submit" style="padding:6px 14px;border:1px solid #ddd;border-radius:6px;background:white;color:#555;cursor:pointer;font-size:0.82rem;">→ @s</button>
+                            </form>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div style="text-align:center;padding:60px;color:#999;">
+                <div style="font-size:3rem;margin-bottom:12px;">📦</div>
+                <p>No orders yet.</p>
+            </div>
+        }
+    </div>
+</div>

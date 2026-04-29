@@ -1,0 +1,81 @@
+@model BaeLilyDesigns.Models.Product
+
+<style>
+.form-row { margin-bottom: 18px; }
+.form-row label { display: block; font-size: 0.85rem; font-weight: 600; color: #2A2118; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-row input, .form-row select, .form-row textarea {
+    width: 100%; padding: 10px 14px; border: 1px solid #e0d8ce; border-radius: 8px;
+    font-family: inherit; font-size: 0.95rem; color: #2A2118; box-sizing: border-box;
+    outline: none; transition: border 0.2s;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: #D4B896; }
+.form-hint { font-size: 0.78rem; color: #999; margin-top: 4px; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+
+<div class="form-row">
+    <label>Product Name</label>
+    <input asp-for="Name" placeholder="e.g. Midnight Bloom" />
+</div>
+
+<div class="form-grid-2">
+    <div class="form-row">
+        <label>Category</label>
+        <select asp-for="Category">
+            <option value="office">Office Chic</option>
+            <option value="goth">Goth</option>
+            <option value="bubbly">Bubbly</option>
+            <option value="bright">Bright</option>
+            <option value="booktok">BookTok</option>
+            <option value="kids">Kids</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label>Emoji</label>
+        <input asp-for="Emoji" placeholder="e.g. 🖤" />
+    </div>
+</div>
+
+<div class="form-grid-2">
+    <div class="form-row">
+        <label>Price (R)</label>
+        <input asp-for="Price" type="number" step="50" placeholder="1100" />
+    </div>
+    <div class="form-row">
+        <label>Original Price (R) – leave blank if not on sale</label>
+        <input asp-for="OriginalPrice" type="number" step="50" placeholder="optional" />
+    </div>
+</div>
+
+<div class="form-row">
+    <label>Description</label>
+    <textarea asp-for="Description" rows="3" placeholder="Describe this hoodie..."></textarea>
+</div>
+
+<div class="form-row">
+    <label>Material</label>
+    <input asp-for="Material" placeholder="e.g. 70% organic cotton, 30% recycled polyester." />
+</div>
+
+<div class="form-row">
+    <label>Colours (hex codes, comma-separated)</label>
+    <input name="colorsInput" value="@string.Join(", ", Model.Colors)" placeholder="#F5F0E8, #D4B896, #8B6F47" />
+    <p class="form-hint">Enter hex codes like #FF69B4, #2D1B3D</p>
+</div>
+
+<div class="form-row">
+    <label>Sizes (comma-separated)</label>
+    <input name="sizesInput" value="@string.Join(", ", Model.Sizes)" placeholder="XS, S, M, L, XL, 2XL, 3XL" />
+    <p class="form-hint">For kids: 3-4Y, 5-6Y, 7-8Y etc.</p>
+</div>
+
+<div class="form-grid-2">
+    <div class="form-row">
+        <label>Stock</label>
+        <input asp-for="Stock" type="number" placeholder="100" />
+    </div>
+    <div class="form-row">
+        <label>Badge (optional)</label>
+        <input asp-for="Badge" placeholder="e.g. Top Seller, New, On Sale" />
+    </div>
+</div>

@@ -122,17 +122,9 @@ function changeQty(productId, size, delta) {
     });
 }
 
-function handleCheckout() {
-    fetch('/Cart/Checkout', { method: 'POST' })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                showToast(data.message);
-                loadCart();
-                toggleCart();
-            }
-        });
-}
+// updateCartUI is an alias for loadCart
+function updateCartUI() { loadCart(); }
+// handleCheckout is defined in _Layout.cshtml to support auth-aware checkout
 
 // ── MODAL ──────────────────────────────────────────────────────────────────
 function openModal() {
@@ -150,10 +142,7 @@ function switchTab(tab, btn) {
     document.getElementById('loginForm').style.display = tab === 'login' ? '' : 'none';
     document.getElementById('registerForm').style.display = tab === 'register' ? '' : 'none';
 }
-function handleLogin() {
-    closeModal();
-    showToast('Welcome to Bae Lily Designs!');
-}
+// handleLogin and handleRegister are defined in _Layout.cshtml
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
 function showToast(msg) {

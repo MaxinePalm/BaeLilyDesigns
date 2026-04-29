@@ -11,7 +11,7 @@
 <body id="pageBody">
 
 <div class="sale-strip">
-    FREE SHIPPING ON ORDERS OVER A$80 - PRE-ORDER NOW - SHIPS IN 2–3 WEEKS
+    FREE SHIPPING ON ORDERS OVER R800 - PRE-ORDER NOW - SHIPS IN 2–3 WEEKS
 </div>
 
 <nav id="mainNav">
@@ -22,9 +22,37 @@
         <li><a asp-controller="About" asp-action="Index">About Us</a></li>
         <li><a asp-controller="Sustain" asp-action="Index">Ethics & Sustainability</a></li>
         <li><a asp-controller="Sales" asp-action="Index">Sales</a></li>
+        @if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
+        {
+            <li><a asp-controller="Admin" asp-action="Products" style="color:var(--accent);font-weight:600;">Admin</a></li>
+        }
     </ul>
     <div class="nav-actions">
-        <button class="nav-btn" onclick="openModal()">Login</button>
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <div class="user-menu" id="userMenuWrap">
+                <button class="nav-btn" onclick="toggleUserMenu()" id="userMenuBtn">
+                    @(User.Identity.Name?.Split('@')[0])
+                    <span style="font-size:0.7rem;">▼</span>
+                </button>
+                <div class="user-dropdown" id="userDropdown" style="display:none;">
+                    <a asp-controller="Orders" asp-action="MyOrders">My Orders</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Products">Manage Products</a>
+                        <a asp-controller="Admin" asp-action="Orders">All Orders</a>
+                    }
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-logout">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <button class="nav-btn" onclick="openModal()">Login</button>
+        }
         <button class="cart-btn" onclick="toggleCart()">
             Bag
             <span class="cart-count" id="cartCount">0</span>
@@ -83,7 +111,6 @@
             <ul>
                 <li><a asp-controller="About" asp-action="Index">About Us</a></li>
                 <li><a asp-controller="Sustain" asp-action="Index">Sustainability</a></li>
-                <li><a asp-controller="Sustain" asp-action="Index">Ethics</a></li>
                 <li><a href="#">Sizing Guide</a></li>
             </ul>
         </div>
@@ -118,7 +145,7 @@
         <div class="cart-timer-notice">Items held for 24 hours - after that they return to stock</div>
         <div class="cart-total-row">
             <span class="cart-total-label">Total</span>
-            <span class="cart-total-num" id="cartTotal">A$0</span>
+            <span class="cart-total-num" id="cartTotal">R0</span>
         </div>
         <button class="checkout-btn" onclick="handleCheckout()">Pre-order Now</button>
     </div>
@@ -130,6 +157,7 @@
         <button class="modal-close" onclick="closeModal()">✕</button>
         <h2>Welcome back</h2>
         <p class="modal-sub">Sign in to track your pre-orders and save your favourites</p>
+        <div id="authMessage" style="display:none;padding:10px;border-radius:8px;margin-bottom:12px;font-size:0.9rem;"></div>
         <div class="modal-tabs">
             <button class="modal-tab active" onclick="switchTab('login', this)">Sign In</button>
             <button class="modal-tab" onclick="switchTab('register', this)">Create Account</button>
@@ -137,28 +165,28 @@
         <div id="loginForm">
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" placeholder="you@example.com">
+                <input type="email" id="loginEmail" placeholder="you@example.com">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" placeholder="••••••••">
+                <input type="password" id="loginPassword" placeholder="••••••••">
             </div>
             <button class="btn-primary" style="width:100%;margin-top:0.5rem;" onclick="handleLogin()">Sign In</button>
         </div>
         <div id="registerForm" style="display:none;">
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" placeholder="Your name">
+                <input type="text" id="regName" placeholder="Your name">
             </div>
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" placeholder="you@example.com">
+                <input type="email" id="regEmail" placeholder="you@example.com">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" placeholder="Create a password">
+                <input type="password" id="regPassword" placeholder="Min 6 characters">
             </div>
-            <button class="btn-primary" style="width:100%;margin-top:0.5rem;" onclick="handleLogin()">Create Account</button>
+            <button class="btn-primary" style="width:100%;margin-top:0.5rem;" onclick="handleRegister()">Create Account</button>
         </div>
     </div>
 </div>
@@ -167,5 +195,116 @@
 <div class="toast" id="toast"></div>
 
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+// Auth functions
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const msg = document.getElementById('authMessage');
+
+    const res = await fetch('/Account/LoginAjax', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        closeModal();
+        showToast('Welcome back, ' + (data.name || data.email) + '!');
+        setTimeout(() => window.location.reload(), 800);
+    } else {
+        msg.style.display = 'block';
+        msg.style.background = '#fee';
+        msg.style.color = '#c00';
+        msg.textContent = data.message;
+    }
+}
+
+async function handleRegister() {
+    const fullName = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const msg = document.getElementById('authMessage');
+
+    const res = await fetch('/Account/RegisterAjax', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, email, password })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        closeModal();
+        showToast('Account created! Welcome, ' + data.name + '!');
+        setTimeout(() => window.location.reload(), 800);
+    } else {
+        msg.style.display = 'block';
+        msg.style.background = '#fee';
+        msg.style.color = '#c00';
+        msg.textContent = data.message;
+    }
+}
+
+function toggleUserMenu() {
+    const dd = document.getElementById('userDropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('userMenuWrap');
+    if (wrap && !wrap.contains(e.target)) {
+        const dd = document.getElementById('userDropdown');
+        if (dd) dd.style.display = 'none';
+    }
+});
+
+async function handleCheckout() {
+    const res = await fetch('/Cart/Checkout', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+        toggleCart();
+        updateCartUI();
+        showToast(data.message);
+    } else if (data.requireLogin) {
+        toggleCart();
+        openModal();
+        showToast('Please sign in to place your order', true);
+    } else {
+        showToast(data.message, true);
+    }
+}
+</script>
+<style>
+.user-menu { position: relative; }
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    min-width: 180px;
+    z-index: 9999;
+    overflow: hidden;
+}
+.user-dropdown a, .dropdown-logout {
+    display: block;
+    padding: 12px 18px;
+    color: #2A2118;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.user-dropdown a:hover, .dropdown-logout:hover { background: #f5f0e8; }
+.dropdown-logout { color: #c0392b; border-top: 1px solid #eee; }
+</style>
 </body>
 </html>

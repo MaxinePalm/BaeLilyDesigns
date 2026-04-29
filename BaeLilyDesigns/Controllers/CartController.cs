@@ -1,12 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
+using BaeLilyDesigns.Data;
 using BaeLilyDesigns.Models;
+using BaeLilyDesigns.Services;
 
 namespace BaeLilyDesigns.Controllers
 {
     public class CartController : Controller
     {
         private const string CartSessionKey = "Cart";
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly EmailService _email;
+
+        public CartController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, EmailService email)
+        {
+            _context = context;
+            _userManager = userManager;
+            _email = email;
+        }
 
         private List<CartItem> GetCart()
         {
@@ -20,9 +33,9 @@ namespace BaeLilyDesigns.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(int productId, string size = "M")
+        public async Task<IActionResult> Add(int productId, string size = "M")
         {
-            var product = ProductRepository.GetById(productId);
+            var product = await _context.Products.FindAsync(productId);
             if (product == null || product.IsSoldOut)
                 return Json(new { success = false, message = "Product not available." });
 
@@ -80,11 +93,55 @@ namespace BaeLilyDesigns.Controllers
         }
 
         [HttpPost]
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
+            var cart = GetCart();
+            if (!cart.Any())
+                return Json(new { success = false, message = "Your bag is empty." });
+
+            if (!User.Identity!.IsAuthenticated)
+                return Json(new { success = false, requireLogin = true, message = "Please sign in to place your order." });
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Json(new { success = false, message = "User not found." });
+
+            var total = cart.Sum(i => i.LineTotal);
+
+            var order = new Order
+            {
+                UserId = user.Id,
+                OrderDate = DateTime.Now,
+                TotalAmount = total,
+                Status = "Pending",
+                Items = cart.Select(i => new OrderItem
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Name,
+                    Size = i.Size,
+                    Color = i.Color,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+            // Send order confirmation email
+            var emailItems = cart.Select(i => (i.Name, i.Size, i.Quantity, i.Price)).ToList();
+            try
+            {
+                await _email.SendOrderConfirmation(user.Email!, user.FullName, order.Id, total, emailItems);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Email send failed: {ex.Message}");
+            }
+
             SaveCart(new List<CartItem>());
-            TempData["OrderSuccess"] = true;
-            return Json(new { success = true, message = "Pre-order placed! You'll receive shipping updates by email." });
+
+            return Json(new { success = true, message = $"Pre-order #{order.Id} placed! Confirmation sent to {user.Email}", orderId = order.Id });
         }
     }
 }

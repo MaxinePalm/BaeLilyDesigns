@@ -1,14 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using BaeLilyDesigns.Models;
+using Microsoft.EntityFrameworkCore;
+using BaeLilyDesigns.Data;
 
 namespace BaeLilyDesigns.Controllers
 {
     public class SalesController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public SalesController(ApplicationDbContext context)
         {
-            var model = ProductRepository.GetOnSale();
-            return View(model);
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var saleProducts = await _context.Products
+                .Where(p => p.OriginalPrice != null)
+                .ToListAsync();
+            return View(saleProducts);
         }
     }
 }

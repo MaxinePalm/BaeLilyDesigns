@@ -1,0 +1,78 @@
+@model List<BaeLilyDesigns.Models.Product>
+@{
+    ViewData["Title"] = "Admin – Products";
+    ViewData["HidePreorder"] = true;
+}
+
+<div style="max-width:1100px;margin:40px auto;padding:0 20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <div>
+            <h1 style="font-family:'Cinzel',serif;font-size:1.8rem;color:#2A2118;">Product Management</h1>
+            <p style="color:#888;margin:4px 0 0;">@Model.Count products in catalogue</p>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <a asp-action="Orders" style="padding:10px 20px;border:2px solid #2A2118;border-radius:8px;color:#2A2118;text-decoration:none;font-size:0.9rem;">View Orders</a>
+            <a asp-action="CreateProduct" style="padding:10px 20px;background:#2A2118;color:#D4B896;border-radius:8px;text-decoration:none;font-size:0.9rem;">+ Add Product</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div style="background:#d4edda;color:#155724;padding:12px 18px;border-radius:8px;margin-bottom:20px;">
+            ✅ @TempData["Success"]
+        </div>
+    }
+
+    <div style="background:white;border-radius:12px;box-shadow:0 2px 20px rgba(0,0,0,0.06);overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+            <thead style="background:#f5f0e8;">
+                <tr>
+                    <th style="padding:14px 18px;text-align:left;font-family:'Cinzel',serif;font-size:0.85rem;color:#2A2118;">Product</th>
+                    <th style="padding:14px 18px;text-align:left;font-family:'Cinzel',serif;font-size:0.85rem;color:#2A2118;">Category</th>
+                    <th style="padding:14px 18px;text-align:right;font-family:'Cinzel',serif;font-size:0.85rem;color:#2A2118;">Price</th>
+                    <th style="padding:14px 18px;text-align:center;font-family:'Cinzel',serif;font-size:0.85rem;color:#2A2118;">Stock</th>
+                    <th style="padding:14px 18px;text-align:center;font-family:'Cinzel',serif;font-size:0.85rem;color:#2A2118;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr style="border-top:1px solid #f0ebe3;">
+                        <td style="padding:14px 18px;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <span style="font-size:2rem;">@p.Emoji</span>
+                                <div>
+                                    <div style="font-weight:600;color:#2A2118;">@p.Name</div>
+                                    @if (p.Badge != null)
+                                    {
+                                        <span style="font-size:0.75rem;background:#D4B896;color:#2A2118;padding:2px 8px;border-radius:20px;">@p.Badge</span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding:14px 18px;color:#666;text-transform:capitalize;">@p.Category</td>
+                        <td style="padding:14px 18px;text-align:right;font-weight:600;color:#2A2118;">
+                            R@p.Price.ToString("N0")
+                            @if (p.OriginalPrice.HasValue)
+                            {
+                                <span style="font-size:0.8rem;color:#999;text-decoration:line-through;margin-left:4px;">R@p.OriginalPrice.Value.ToString("N0")</span>
+                            }
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <span style="color:@(p.Stock < 20 ? "#E53E3E" : p.Stock < 50 ? "#D4A017" : "#27AE60");font-weight:600;">@p.Stock</span>
+                        </td>
+                        <td style="padding:14px 18px;text-align:center;">
+                            <div style="display:flex;gap:8px;justify-content:center;">
+                                <a asp-action="EditProduct" asp-route-id="@p.Id" style="padding:6px 14px;background:#f5f0e8;border-radius:6px;color:#2A2118;text-decoration:none;font-size:0.85rem;">Edit</a>
+                                <form asp-action="DeleteProduct" asp-route-id="@p.Id" method="post" onsubmit="return confirm('Delete @p.Name?');" style="margin:0;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" style="padding:6px 14px;background:#fee;border:none;border-radius:6px;color:#c00;cursor:pointer;font-size:0.85rem;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
