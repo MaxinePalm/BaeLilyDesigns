@@ -50,7 +50,7 @@ namespace BaeLilyDesigns.Services
             var itemRows = string.Join("", items.Select(i =>
                 $"<tr><td style='padding:8px;border-bottom:1px solid #eee;'>{i.name} ({i.size})</td>" +
                 $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:center;'>{i.qty}</td>" +
-                $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right;'>R{i.price * i.qty:N0}</td></tr>"));
+                $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right;'>A${i.price * i.qty:N0}</td></tr>"));
 
             var body = $@"
 <!DOCTYPE html>
@@ -77,7 +77,7 @@ namespace BaeLilyDesigns.Services
         <tfoot>
           <tr>
             <td colspan='2' style='padding:12px;font-weight:bold;color:#2A2118;'>Total</td>
-            <td style='padding:12px;text-align:right;font-weight:bold;color:#2A2118;font-size:1.1rem;'>R{total:N0}</td>
+            <td style='padding:12px;text-align:right;font-weight:bold;color:#2A2118;font-size:1.1rem;'>A${total:N0}</td>
           </tr>
         </tfoot>
       </table>

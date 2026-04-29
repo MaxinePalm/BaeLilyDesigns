@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:1.3rem;font-weight:700;color:#2A2118;">R@order.TotalAmount.ToString("N0")</div>
+                        <div style="font-size:1.3rem;font-weight:700;color:#2A2118;">A$@order.TotalAmount.ToString("N0")</div>
                         <span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.8rem;margin-top:4px;
                               background:@(order.Status == "Delivered" ? "#d4edda" : order.Status == "Shipped" ? "#cce5ff" : order.Status == "Cancelled" ? "#fee" : "#fff3cd");
                               color:@(order.Status == "Delivered" ? "#155724" : order.Status == "Shipped" ? "#004085" : order.Status == "Cancelled" ? "#c00" : "#856404");">
@@ -59,7 +59,7 @@
                     {
                         <div style="display:flex;justify-content:space-between;padding:4px 0;color:#555;font-size:0.9rem;">
                             <span>@item.ProductName – @item.Size × @item.Quantity</span>
-                            <span>R@((item.Price * item.Quantity).ToString("N0"))</span>
+                            <span>A$@((item.Price * item.Quantity).ToString("N0"))</span>
                         </div>
                     }
                 </div>

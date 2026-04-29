@@ -29,7 +29,7 @@
                             <span style="color:#888;font-size:0.85rem;margin-left:12px;">@order.OrderDate.ToString("dd MMM yyyy")</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="font-weight:700;color:#2A2118;font-size:1.1rem;">R@order.TotalAmount.ToString("N0")</span>
+                            <span style="font-weight:700;color:#2A2118;font-size:1.1rem;">A$@order.TotalAmount.ToString("N0")</span>
                             <span style="padding:5px 14px;border-radius:20px;font-size:0.82rem;
                                   background:@(order.Status == "Delivered" ? "#d4edda" : order.Status == "Shipped" ? "#cce5ff" : order.Status == "Cancelled" ? "#fee" : "#fff3cd");
                                   color:@(order.Status == "Delivered" ? "#155724" : order.Status == "Shipped" ? "#004085" : order.Status == "Cancelled" ? "#c00" : "#856404");">
@@ -48,7 +48,7 @@
                                         <div style="color:#888;font-size:0.85rem;">Size: @item.Size · Qty: @item.Quantity</div>
                                     </div>
                                 </div>
-                                <span style="font-weight:600;color:#2A2118;">R@((item.Price * item.Quantity).ToString("N0"))</span>
+                                <span style="font-weight:600;color:#2A2118;">A$@((item.Price * item.Quantity).ToString("N0"))</span>
                             </div>
                         }
 

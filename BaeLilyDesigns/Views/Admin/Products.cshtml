@@ -52,10 +52,10 @@
                         </td>
                         <td style="padding:14px 18px;color:#666;text-transform:capitalize;">@p.Category</td>
                         <td style="padding:14px 18px;text-align:right;font-weight:600;color:#2A2118;">
-                            R@p.Price.ToString("N0")
+                            A$@p.Price.ToString("N0")
                             @if (p.OriginalPrice.HasValue)
                             {
-                                <span style="font-size:0.8rem;color:#999;text-decoration:line-through;margin-left:4px;">R@p.OriginalPrice.Value.ToString("N0")</span>
+                                <span style="font-size:0.8rem;color:#999;text-decoration:line-through;margin-left:4px;">A$@p.OriginalPrice.Value.ToString("N0")</span>
                             }
                         </td>
                         <td style="padding:14px 18px;text-align:center;">

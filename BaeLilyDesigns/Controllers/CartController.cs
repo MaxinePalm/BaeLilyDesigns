@@ -141,7 +141,7 @@ namespace BaeLilyDesigns.Controllers
 
             SaveCart(new List<CartItem>());
 
-            return Json(new { success = true, message = $"Pre-order #{order.Id} placed! Confirmation sent to {user.Email}", orderId = order.Id });
+            return Json(new { success = true, message = $"Pre-order #{ order.Id} placed! Confirmation sent to {user.Email}", orderId = order.Id });
         }
     }
 }
